@@ -1,1 +1,37 @@
+#!url=
+#!name=Unlock ALL APP + Youtube AdBlock
+#!desc=TNETZ | Tích hợp chặn quảng cáo YouTube + Mở khóa nhiều ứng dụng
 
+[General]
+bypass-system = true
+skip-proxy = *.local, *.crashlytics.com
+tun-excluded-routes = 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12
+
+[Rule]
+AND,((DOMAIN-SUFFIX,googlevideo.com), (PROTOCOL,UDP)),REJECT
+AND,((DOMAIN,youtubei.googleapis.com), (PROTOCOL,UDP)),REJECT
+
+[URL Rewrite]
+(^https?://[\w-]+\.googlevideo\.com/(?!dclk_video_ads).+?)&ctier=L(&.+?),ctier,(.+) $1$2$3 302
+^https?:\/\/[\w-]+\.googlevideo\.com\/initplayback.+&oad _ reject-200
+^https?://(www|s)\.youtube\.com/api/stats/ads _ reject-200
+^https?://(www|s)\.youtube\.com/(pagead|ptracking) _ reject-200
+^https?://s\.youtube\.com/api/stats/qoe\?adcontext _ reject-200
+https?:\/\/.+\.googlevideo\.com\/.+&oad reject HEADER
+https?:\/\/.+\.googlevideo\.com\/ptracking\?pltype=adhost reject header
+https?:\/\/.+\.youtube\.com\/api\/stats\/.+adformat reject header
+https?:\/\/.+\.youtube\.com\/api\/stats\/ads reject header
+https?:\/\/.+\.youtube\.com\/get_midroll reject header
+https?:\/\/.+\.youtube\.com\/pagead\/ reject header
+https?:\/\/.+\.youtube\.com\/ptracking\? reject header
+https?:\/\/m\.youtube\.com\/_get_ads reject header
+https?:\/\/s\.youtube\.com\/api\/stats\/watchtime?adformat reject header
+https?:\/\/youtubei\.googleapis\.com/.+ad_break reject header
+http-request ^https:\/\/spclient\.wg\.spotify\.com\/user-customization-service\/v1\/customize$ header-del if-none-match
+[Script]
+youtube.request = type=http-request,pattern=^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(browse|next|player|reel\/reel_watch_sequence|get_watch),requires-body=1,max-size=-1,binary-body-mode=1,engine={{{Công cụ thực thi tập lệnh}}},script-path=https://shoptnetz.com/shadowrocket/youtube.request.preview.js
+youtube.response = type=http-response,pattern=^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(browse|next|player|search|reel\/reel_watch_sequence|guide|account\/get_setting|get_watch),requires-body=1,max-size=-1,binary-body-mode=1,engine={{{Công cụ thực thi tập lệnh}}},script-path=https://shoptnetz.com/shadowrocket/youtube.response.preview.js,argument="{"lyricLang":"{{{Ngôn ngữ dịch lời bài hát}}}","captionLang":"{{{Ngôn ngữ dịch phụ đề}}}","blockUpload":{{{Nút chặn tải lên}}},"blockImmersive":{{{Nút chọn khối}}},"debug":{{{Bật chế độ gỡ lỗi}}}}"
+
+
+revenuecat = type=http-response, pattern=^https:\/\/api\.revenuecat\.com\/.+\/(receipts$|subscribers\/[^/]+$), script-path=https://shoptnetz.com/shadowrocket/Locket_Gold.js, requires-body=true, max-size=-1, timeout=60
+deleteHeader = type=http-request, pattern=^https:\/\/api\.revenuecat\.com\/.+\/(receipts|subscribers), script-path=https://shoptnetz.com/shadowrocket/delete_header.js, timeout=60
